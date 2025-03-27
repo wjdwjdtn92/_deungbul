@@ -1,7 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/shared/ui/button';
+import { useAuthStore } from '@/features/auth/model/auth-store';
+import { signOut } from '@/features/auth';
 
-export default function Header() {
+export function Header() {
+  const { user, isLoading } = useAuthStore();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
@@ -20,9 +26,18 @@ export default function Header() {
             </Button>
           </nav>
           <nav className="flex items-center">
-            <Button variant="ghost" asChild>
-              <Link href="/login">로그인</Link>
-            </Button>
+            {!isLoading &&
+              (user ? (
+                <form action={signOut}>
+                  <Button variant="ghost" type="submit">
+                    로그아웃
+                  </Button>
+                </form>
+              ) : (
+                <Button variant="ghost" asChild>
+                  <Link href="/login">로그인</Link>
+                </Button>
+              ))}
           </nav>
         </div>
       </div>
