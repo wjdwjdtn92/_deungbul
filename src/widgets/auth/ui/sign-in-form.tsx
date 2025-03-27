@@ -1,6 +1,8 @@
 'use client';
 
-import { signIn } from '@/features/auth/model/auth-actions';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { signInSchema, type SignInSchema } from '@/shared/types/auth';
 import { Button } from '@/shared/ui/button';
 import {
   Form,
@@ -11,18 +13,14 @@ import {
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
-import {
-  type SignInForm as SignInFormType,
-  signInSchema,
-} from '@/shared/types/auth';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { signIn } from '@/features/auth';
+import { useState } from 'react';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form';
-import { useFormState } from 'react-dom';
 
-export function SignInForm() {
-  const [state, formAction] = useFormState(signIn, null);
-  const form = useForm<SignInFormType>({
+export default function SignInForm() {
+  const [error, setError] = useState<string>('');
+
+  const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: '',
@@ -30,9 +28,16 @@ export function SignInForm() {
     },
   });
 
+  async function onSubmit(data: SignInSchema) {
+    const result = await signIn(data);
+    if (result?.error) {
+      setError(result.error);
+    }
+  }
+
   return (
     <Form {...form}>
-      <form action={formAction} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
@@ -40,7 +45,7 @@ export function SignInForm() {
             <FormItem>
               <FormLabel>이메일</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="name@example.com" {...field} />
+                <Input placeholder="name@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -59,6 +64,7 @@ export function SignInForm() {
             </FormItem>
           )}
         />
+        {error && <div className="text-sm text-red-500">{error}</div>}
         <Button type="submit" className="w-full">
           로그인
         </Button>

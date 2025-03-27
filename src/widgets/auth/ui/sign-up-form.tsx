@@ -1,6 +1,8 @@
 'use client';
 
-import { signUp } from '@/features/auth/model/auth-actions';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { signUpSchema, type SignUpSchema } from '@/shared/types/auth';
 import { Button } from '@/shared/ui/button';
 import {
   Form,
@@ -11,18 +13,15 @@ import {
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
-import {
-  type SignUpForm as SignUpFormType,
-  signUpSchema,
-} from '@/shared/types/auth';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { signUp } from '@/features/auth';
+import { useState } from 'react';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form';
-import { useFormState } from 'react-dom';
 
-export function SignUpForm() {
-  const [state, formAction] = useFormState(signUp, null);
-  const form = useForm<SignUpFormType>({
+export default function SignUpForm() {
+  const [message, setMessage] = useState<string>('');
+  const [error, setError] = useState<string>('');
+
+  const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: '',
@@ -31,9 +30,20 @@ export function SignUpForm() {
     },
   });
 
+  async function onSubmit(data: SignUpSchema) {
+    const result = await signUp(data);
+    if (result?.error) {
+      setError(result.error);
+      setMessage('');
+    } else if (result?.message) {
+      setMessage(result.message);
+      setError('');
+    }
+  }
+
   return (
     <Form {...form}>
-      <form action={formAction} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="email"
@@ -41,7 +51,7 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>이메일</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="name@example.com" {...field} />
+                <Input placeholder="name@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -73,6 +83,8 @@ export function SignUpForm() {
             </FormItem>
           )}
         />
+        {error && <div className="text-sm text-red-500">{error}</div>}
+        {message && <div className="text-sm text-green-500">{message}</div>}
         <Button type="submit" className="w-full">
           회원가입
         </Button>
