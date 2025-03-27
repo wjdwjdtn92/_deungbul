@@ -37,7 +37,7 @@ export default function SignInForm() {
       </form>
       <div className="text-center text-sm">
         계정이 없으신가요?{' '}
-        <Link href="/signup" className="text-primary hover:underline">
+        <Link href="/auth/sign-up" className="text-primary hover:underline">
           회원가입
         </Link>
       </div>

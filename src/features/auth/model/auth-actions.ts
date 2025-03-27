@@ -16,7 +16,14 @@ export async function signIn(formData: FormData) {
   });
 
   if (error) {
-    redirect('/error');
+    const { message, code, status } = error;
+    const searchParams = new URLSearchParams({
+      message,
+      code: code?.toString() ?? '',
+      status: status?.toString() ?? '',
+    });
+
+    redirect(`/auth/error?${searchParams.toString()}`);
   }
 
   revalidatePath('/', 'layout');
@@ -28,6 +35,17 @@ export async function signUp(formData: FormData) {
 
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
+
+  if (password !== confirmPassword) {
+    const searchParams = new URLSearchParams({
+      message: '비밀번호가 일치하지 않습니다.',
+      code: 'PASSWORD_MISMATCH',
+      status: '400',
+    });
+
+    redirect(`/auth/error?${searchParams.toString()}`);
+  }
 
   const supabase = await createClient();
 
@@ -40,7 +58,14 @@ export async function signUp(formData: FormData) {
   });
 
   if (error) {
-    redirect('/error');
+    const { message, code, status } = error;
+    const searchParams = new URLSearchParams({
+      message,
+      code: code?.toString() ?? '',
+      status: status?.toString() ?? '',
+    });
+
+    redirect(`/auth/error?${searchParams.toString()}`);
   }
 
   revalidatePath('/', 'layout');
@@ -54,5 +79,5 @@ export async function signOut() {
   await supabase.auth.signOut();
 
   revalidatePath('/', 'layout');
-  redirect('/login');
+  redirect('/auth/sign-in');
 }

@@ -49,7 +49,7 @@ export default function SignUpForm() {
       </form>
       <div className="text-center text-sm">
         이미 계정이 있으신가요?{' '}
-        <Link href="/login" className="text-primary hover:underline">
+        <Link href="/auth/sign-in" className="text-primary hover:underline">
           로그인
         </Link>
       </div>

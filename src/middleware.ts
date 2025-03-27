@@ -41,7 +41,7 @@ async function updateSession(request: NextRequest) {
   // 보호된 라우트 체크
   if (protectedRoutes.includes(path) && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = '/auth/sign-in';
     return NextResponse.redirect(url);
   }
 
