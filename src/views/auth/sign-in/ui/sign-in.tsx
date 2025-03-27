@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { SignInForm } from '@/widgets/auth/ui/sign-in-form';
+import { SignInForm } from '@/widgets/auth';
 
 export default function SignInView() {
   return (
